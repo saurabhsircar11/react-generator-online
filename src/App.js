@@ -8,6 +8,8 @@ import 'react-toastify/dist/ReactToastify.css'
 
 const apiUrl = 'https://node-app-generator.herokuapp.com/package'
 
+//const apiUrl= 'http://localhost:4000/package'
+
 
 class App extends Component {
     constructor(props) {
@@ -27,23 +29,31 @@ class App extends Component {
     };
 
     async onGenerate() {
-        console.log(this.state.packageName)
-        let response = await new PackageService().createPackage(this.state.packageName, this.state.additionalPackages)
-        // fileDownload(response.data,this.state.packageName);
-        // window.open('http://localhost:4000/package/download/' + this.state.packageName);
-        if (response !== null) {
-            this.notify()
+        let regex = new RegExp('^(?:@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$');
+        if (this.state.packageName.length > 0 && regex.test(this.state.packageName)) {
+            let response = await new PackageService().createPackage(this.state.packageName, this.state.additionalPackages)
+            if (response !== null) {
+                this.notifySuccess("Package generated please download")
+            }
+            else {
+                this.notifyError('Something went wrong. Please try after sometime.')
+            }
         }
-        console.log(response)
+        else if (this.state.packageName.length === 0) {
+            this.notifyError('Please enter a package name')
+        }
+        else {
+            this.notifyError('Please enter a valid name')
+        }
     }
 
-    notify = () => toast.success("Package generated please download");
+    notifySuccess = (msg) => toast.success(msg);
+
+    notifyError = (msg) => toast.error(msg);
 
     handleChange = (e) => {
         const item = e.target.name;
         const isChecked = e.target.checked;
-        console.log(item)
-
         let additionalPackages = this.state.additionalPackages.map((items) => {
             if (items.dependencyName === item) {
                 items.isChecked = isChecked

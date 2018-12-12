@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const BASE_URL = 'https://node-app-generator.herokuapp.com/package';
+//const BASE_URL = 'http://localhost:4000/package';
 export default class PackageService {
 
     async getAdditionalPackages() {
